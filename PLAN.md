@@ -6,14 +6,15 @@
 
 ## 1. Project Overview
 
-A cross-platform system monitoring application that displays real-time statistics about running processes, including CPU usage, memory consumption, and I/O operations. The application will feature a modern graphical user interface and support both Windows and Linux operating systems.
+A system monitoring application that displays real-time statistics about running processes, including CPU usage, memory consumption, and I/O operations. The application will feature a modern graphical user interface with primary support for Linux operating systems, and optional Windows support if time permits.
 
 ---
 
 ## 2. Platform Chosen
 
-- **Primary Target**: Windows 10/11 and Linux (Ubuntu 20.04+, Fedora, Arch)
-- **Cross-Platform Development**: Using platform-agnostic code with OS-specific modules
+- **Primary Target (Required)**: Linux (Ubuntu 20.04+, Fedora, Arch)
+- **Secondary Target (Optional)**: Windows 10/11
+- **Development Approach**: Linux-first development with optional cross-platform support
 - **Architecture Support**: x86-64 (64-bit systems)
 
 ---
@@ -101,9 +102,10 @@ Existing solutions are often platform-specific (Task Manager on Windows, top/hto
    - Network I/O monitoring (bytes sent/received)
    - I/O rate visualization
 
-5. **Cross-Platform Support**
-   - Single codebase supporting both Windows and Linux
-   - Platform-specific optimizations where necessary
+5. **Linux Platform Support (Required)**
+   - Full implementation for Linux systems
+   - Utilize /proc filesystem for data collection
+   - Optional Windows support as stretch goal
 
 6. **User Interface Features**
    - Sortable columns (by CPU, memory, name, PID)
@@ -207,11 +209,10 @@ Existing solutions are often platform-specific (Task Manager on Windows, top/hto
 
 ### Phase 2: Core Development (Weeks 2-4)
 
-- Implement platform abstraction layer
-- Develop process enumeration for Windows
 - Develop process enumeration for Linux
-- Implement CPU monitoring module
-- Implement memory monitoring module
+- Implement CPU monitoring module for Linux
+- Implement memory monitoring module for Linux
+- Implement platform abstraction layer (optional for Windows support)
 
 ### Phase 3: I/O & GUI (Weeks 5-6)
 
@@ -238,19 +239,21 @@ Existing solutions are often platform-specific (Task Manager on Windows, top/hto
 
 ## 8. Team Responsibilities
 
-### Developer 1: Backend & Windows Implementation
+### Developer 1: Backend & Linux Core Implementation
 
-- Windows system APIs integration
+- Linux /proc filesystem parsing
 - Process enumeration and monitoring
 - CPU/Memory statistics collection
+- I/O statistics implementation
 - Performance optimization
 
-### Developer 2: GUI & Linux Implementation
+### Developer 2: GUI & Integration
 
 - Qt GUI design and implementation
-- Linux /proc parsing and monitoring
 - Charts and visualization
 - User interaction features
+- Integration with backend modules
+- Optional: Windows support if time permits
 
 ### Shared Responsibilities
 
@@ -288,12 +291,13 @@ Existing solutions are often platform-specific (Task Manager on Windows, top/hto
 
 The project will be considered successful if:
 
-1. Application runs on both Windows and Linux without crashes
+1. Application runs on Linux without crashes
 2. Accurately displays real-time CPU, memory, and I/O statistics
 3. GUI is responsive and updates smoothly
 4. Users can interact with processes (view details, terminate)
 5. Code is well-documented and maintainable
 6. Application has minimal performance impact on the system
+7. Bonus: Windows support (stretch goal)
 
 ---
 
