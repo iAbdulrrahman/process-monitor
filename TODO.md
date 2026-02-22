@@ -19,10 +19,10 @@
 
 ### 1.2 Project Initialization
 
-- [ ] Create GitHub repository (already done ✓)
-- [ ] Clone repository to local machines
-- [ ] Create initial project structure:
-  - [ ] `src/` directory for source code
+- [x] Create GitHub repository (already done ✓)
+- [x] Clone repository to local machines
+- [x] Create initial project structure:
+  - [x] `src/` directory for source code
   - [ ] `include/` directory for headers
   - [ ] `tests/` directory for unit tests
   - [ ] `docs/` directory for documentation
@@ -45,10 +45,10 @@
 
 ### 2.1 Project Structure & Architecture
 
-- [ ] Design class hierarchy (ProcessMonitor, Process, SystemInfo)
-- [ ] Create header files for main classes
-- [ ] Implement platform abstraction layer interface
-- [ ] Create Linux implementation files
+- [x] Design class hierarchy (ProcessMonitor, Process, SystemInfo)
+- [x] Create header files for main classes
+- [x] Implement platform abstraction layer interface
+- [x] Create Linux implementation files
 
 ### 2.2 Process Enumeration (Linux)
 
