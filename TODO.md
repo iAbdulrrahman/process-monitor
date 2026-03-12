@@ -27,9 +27,9 @@
   - [ ] `tests/` directory for unit tests
   - [ ] `docs/` directory for documentation
   - [ ] `resources/` directory for UI resources
-- [ ] Create initial CMakeLists.txt file
+- [x] Create initial CMakeLists.txt file
 - [ ] Create README.md with build instructions
-- [ ] Set up .gitignore for C++/Qt/CMake
+- [x] Set up .gitignore for C++/Qt/CMake
 
 ### 1.3 Learning & Research
 
