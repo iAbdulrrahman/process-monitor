@@ -26,8 +26,8 @@ void ResourceInfo::fetchCPUStats() {
     std::string path = std::format(PROC_CPU_STATS_PATH, this->pID);
     std::string output = open_file(path);
     std::vector<std::string> stats = split_string(output, " ");
-    int utime = std::stoi(stats.at(13));
-    int stime = std::stoi(stats.at(14));
+    long utime = std::stoi(stats.at(13));
+    long stime = std::stoi(stats.at(14));
     if(this->cpuUsage.previousUtime == 0 && this->cpuUsage.previousStime == 0) {
         // First sample, no calculation can be done.
         this->cpuUsage.previousUtime = utime;
