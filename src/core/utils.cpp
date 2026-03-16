@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <string>
 #include <fstream>
+#include <ranges>
 #include "utils.h"
 
 namespace fs = std::filesystem;
@@ -26,4 +27,12 @@ std::string open_file(std::string path) {
         }
     }
     return fileContents;
+}
+
+std::vector<std::string> split_string(std::string str, std::string delimeter) {
+    std::vector<std::string> splitted;
+    for(const auto &word : std::views::split(str, delimeter)) {
+        splitted.push_back(std::string(word.begin(), word.end()));
+    }
+    return splitted;
 }
