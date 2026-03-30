@@ -23,7 +23,13 @@ void ProcessMonitor::fetchProcesses() {
 }
 
 void ProcessMonitor::addProcess(std::string pID) {
-    processes.push_back(Process(pID));
+    bool isDuplicate = false;
+    for(const Process &process : process) {
+        if(process.getID() == pID) {
+            isDuplicate = true;
+        }
+    }
+    if(!isDuplicate) processes.push_back(Process(pID));
 }
 
 void ProcessMonitor::removeProcess(Process process) {
