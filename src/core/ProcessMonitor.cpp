@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include "ProcessMonitor.h"
 #include "Process.h"
+#include "utils.h"
 
 ProcessMonitor::ProcessMonitor() {
     this->fetchProcesses();
@@ -9,6 +11,15 @@ ProcessMonitor::ProcessMonitor() {
 
 void ProcessMonitor::fetchProcesses() {
     // TODO: Parsing /proc/ and get list of PIDs and add it using this->addProcess(pid)
+    std::vector<std::string> listOfDirs = list_dir("/proc/");
+    for (const std::string &str : listOfDirs) {
+        try {
+            std::stoi(str);
+            this->addProcess(str);
+        } catch (std::invalid_argument const& ex) {
+            continue;
+        }
+    }
 }
 
 void ProcessMonitor::addProcess(std::string pID) {
