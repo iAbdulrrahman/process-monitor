@@ -123,10 +123,10 @@
 
 ### 3.1 Qt Project Setup
 
-- [ ] Create Qt Widgets application structure
-- [ ] Set up main window class
-- [ ] Configure CMake for Qt integration
-- [ ] Test basic Qt window creation
+- [X] Create Qt Widgets application structure
+- [X] Set up main window class
+- [X] Configure CMake for Qt integration
+- [X] Test basic Qt window creation
 
 ### 3.2 Main Window UI
 
