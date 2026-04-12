@@ -144,7 +144,7 @@
 - [ ] Implement column headers
 - [ ] Enable column sorting (click header to sort)
 - [x] Implement row selection
-- [ ] Add alternating row colors
+- [x] Add alternating row colors
 - [ ] Implement color coding for high resource usage
 
 ### 3.4 Search and Filter
