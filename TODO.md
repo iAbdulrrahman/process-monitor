@@ -139,8 +139,8 @@
 
 ### 3.3 Process Table View
 
-- [ ] Create QTableWidget for process list
-- [ ] Add columns: PID, Name, CPU%, Memory, I/O Read, I/O Write, Status
+- [x] Create QTableWidget for process list
+- [x] Add columns: PID, Name, CPU%, Memory, I/O Read, I/O Write, Status
 - [ ] Implement column headers
 - [ ] Enable column sorting (click header to sort)
 - [ ] Implement row selection
