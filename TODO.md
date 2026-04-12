@@ -143,7 +143,7 @@
 - [x] Add columns: PID, Name, CPU%, Memory, I/O Read, I/O Write, Status
 - [ ] Implement column headers
 - [ ] Enable column sorting (click header to sort)
-- [ ] Implement row selection
+- [x] Implement row selection
 - [ ] Add alternating row colors
 - [ ] Implement color coding for high resource usage
 
