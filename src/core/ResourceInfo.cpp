@@ -59,7 +59,7 @@ void ResourceInfo::fetchMemStats() {
     std::string output = open_file(path);
     std::vector<std::string> statm = split_string(output, " ");
 
-    this->memSize = statm.at(0);
+    this->memSize = std::stod(statm.at(0));
 
 }
 
