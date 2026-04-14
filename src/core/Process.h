@@ -3,6 +3,8 @@
 #include <iostream>
 #include "ResourceInfo.h"
 
+constexpr std::string PROC_NAME_PATH = "/proc/{}/comm";
+
 class Process {
     public:
         Process(std::string processID);

@@ -1,6 +1,8 @@
 #include <iostream>
+#include <format>
 #include "Process.h"
 #include "ResourceInfo.h"
+#include "utils.h"
 
 Process::Process(std::string processID)
     : pID {processID}, resourceInfo {processID}
@@ -23,7 +25,7 @@ std::string Process::getOwner() {
 };
 
 void Process::fetchName() {
-    // TODO: Parsing /proc/{pid} to get the name of the process.
+    this->name = open_file(std::format(PROC_NAME_PATH, this->pID));
 };
 
 void Process::fetchOwner() {
