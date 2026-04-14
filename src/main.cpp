@@ -1,6 +1,6 @@
 #include <iostream>
 #include "core/ProcessMonitor.h"
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 
 #include <QApplication>
 #include <QTableWidget>
