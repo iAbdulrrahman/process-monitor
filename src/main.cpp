@@ -1,8 +1,16 @@
 #include <iostream>
 #include "core/ProcessMonitor.h"
+#include "mainwindow.h"
 
-int main() {
-    std::cout << "Hello there!" << std::endl;
+#include <QApplication>
+#include <QTableWidget>
 
-    return 0;
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv); //anything between these two lines is so run the application
+    MainWindow w;
+    w.show();
+    return a.exec(); //anything between these two lines is so run the application
 }
+
