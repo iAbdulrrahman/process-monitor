@@ -24,7 +24,7 @@ void ProcessMonitor::fetchProcesses() {
 
 void ProcessMonitor::addProcess(std::string pID) {
     bool isDuplicate = false;
-    for(const Process &process : processes) {
+    for(Process &process : processes) {
         if(process.getID() == pID) {
             isDuplicate = true;
         }
