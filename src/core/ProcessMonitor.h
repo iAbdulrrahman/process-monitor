@@ -8,7 +8,7 @@ class ProcessMonitor {
     public:
         ProcessMonitor();
         Process getProcess(std::string processID);
-        std::vector<Process> getProcesses();
+        const std::vector<Process>& getProcesses() const;
         void refresh();
     private:
         std::vector<Process> processes = {};

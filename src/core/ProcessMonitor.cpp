@@ -17,7 +17,7 @@ void ProcessMonitor::refresh() {
     this->fetchProcesses();
 }
 
-std::vector<Process> ProcessMonitor::getProcesses() {
+const std::vector<Process>& ProcessMonitor::getProcesses() const {
     return this->processes;
 }
 
