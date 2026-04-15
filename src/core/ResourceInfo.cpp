@@ -23,12 +23,21 @@ void ResourceInfo::fetchInfo() {
     this->fetchIOStats();
 }
 
-double ResourceInfo::getCPURate() {
-    return this->cpuUsage.cpuUtilizationRate;
+std::string ResourceInfo::getCPURate() {
+    // format to percentage with 2 decimal places
+    return std::format("{:.2f}%", this->cpuUsage.cpuUtilizationRate);
 }
 
 std::string ResourceInfo::getMemSize() {
-    return format_size_from_kb(this->memSize);
+    return format_size_from_bytes(this->memSize);
+}
+
+std::string ResourceInfo::getReadSpeed() {
+    return format_size_from_bytes(this->diskUsage.read_speed) + "/s";
+}
+
+std::string ResourceInfo::getWriteSpeed() {
+    return format_size_from_bytes(this->diskUsage.write_speed) + "/s";
 }
 
 void ResourceInfo::fetchCPUStats() {
@@ -36,6 +45,10 @@ void ResourceInfo::fetchCPUStats() {
 
     std::string path = std::format(PROC_CPU_STATS_PATH, this->pID);
     std::string output = open_file(path);
+
+    if(output.empty()) {
+        return;
+    }
 
     // /proc/<pid>/stat has format:
     // 1 pid, 2 (comm, may contain spaces), 3 state, ...
@@ -74,7 +87,7 @@ void ResourceInfo::fetchCPUStats() {
     long utime = std::stol(tailStats.at(11));
     long stime = std::stol(tailStats.at(12));
 
-    if(this->cpuUsage.previousUtime == 0 && this->cpuUsage.previousStime == 0) {
+    if(this->cpuUsage.previousUtime == -1 && this->cpuUsage.previousStime == -1) {
         // First sample, no calculation can be done.
         this->cpuUsage.previousUtime = utime;
         this->cpuUsage.previousStime = stime;
@@ -103,10 +116,47 @@ void ResourceInfo::fetchMemStats() {
     std::string output = open_file(path);
     std::vector<std::string> statm = split_string(output, " ");
 
-    this->memSize = std::stod(statm.at(5));
+    if(output.empty()) {
+        return;
+    }
 
+    int pageSize = sysconf(_SC_PAGESIZE);
+
+    long residentPages = std::stol(statm.at(1));
+    long residentSize = residentPages * pageSize;
+    long sharedPages = std::stol(statm.at(2));
+    long sharedSize = sharedPages * pageSize;
+
+    this->memSize = residentSize - sharedSize;
 }
 
 void ResourceInfo::fetchIOStats() {
-    
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+
+    std::string path = std::format(PROC_IO_STATS_PATH, this->pID);
+    std::string output = open_file(path);
+    std::vector<std::string> iostat = split_string(output, "\n");
+
+    if(output.empty()) {
+        return;
+    }
+
+    long read_bytes = std::stol(split_string(iostat.at(4), ": ").at(1));
+    long write_bytes = std::stol(split_string(iostat.at(5), ": ").at(1));
+
+    if(this->diskUsage.prev_read_bytes == -1 && this->diskUsage.prev_write_bytes == -1) {
+        this->diskUsage.prev_read_bytes = read_bytes;
+        this->diskUsage.prev_write_bytes = write_bytes;
+        this->diskUsage.previousTime = currentTime;
+    } else {
+        long delta_read_bytes = read_bytes - this->diskUsage.prev_read_bytes;
+        long delta_write_bytes = write_bytes - this->diskUsage.prev_write_bytes;
+        double elapsedSeconds = std::chrono::duration<double>(currentTime - this->diskUsage.previousTime).count();
+
+        this->diskUsage.read_speed = (elapsedSeconds > 0.0) ? static_cast<long>(delta_read_bytes / elapsedSeconds) : 0;
+        this->diskUsage.write_speed = (elapsedSeconds > 0.0) ? static_cast<long>(delta_write_bytes / elapsedSeconds) : 0;
+        this->diskUsage.prev_read_bytes = read_bytes;
+        this->diskUsage.prev_write_bytes = write_bytes;
+        this->diskUsage.previousTime = currentTime;
+    }
 }

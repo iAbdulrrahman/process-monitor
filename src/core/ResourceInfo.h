@@ -10,18 +10,19 @@ constexpr std::string PROC_IO_STATS_PATH = "/proc/{}/io";
 const int HZ = sysconf(_SC_CLK_TCK);
 
 struct cpu_usage {
-    long previousUtime = 0;
-    long previousStime = 0;
+    long previousUtime = -1;
+    long previousStime = -1;
     std::chrono::steady_clock::time_point previousTime;
     double cpuUtilizationRate = 0;
 };
 
 struct disk_usage
 {
-    int read_bytes;
-    int write_bytes;
-    int prev_read_bytes;
-    int prev_wrtie_bytes;
+    long prev_read_bytes = -1;
+    long prev_write_bytes = -1;
+    std::chrono::steady_clock::time_point previousTime;
+    long read_speed = 0;
+    long write_speed = 0;
 };
 
 
@@ -30,8 +31,10 @@ class ResourceInfo
     public:
         ResourceInfo(std::string processID);
         void fetchInfo();
-        double getCPURate();
+        std::string getCPURate();
         std::string getMemSize();
+        std::string getReadSpeed();
+        std::string getWriteSpeed();
     private:
         std::string pID;
         double memSize = 0.0;
