@@ -4,8 +4,8 @@ add_subdirectory(ui)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    core_lib
     ui_lib
+    core_lib
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

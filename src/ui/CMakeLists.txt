@@ -18,5 +18,6 @@ target_include_directories(ui_lib PUBLIC
 )
 
 target_link_libraries(ui_lib PUBLIC
+	core_lib
 	Qt${QT_VERSION_MAJOR}::Widgets
 )
