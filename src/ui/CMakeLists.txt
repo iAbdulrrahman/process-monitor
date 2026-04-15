@@ -8,9 +8,15 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 add_library(ui_lib STATIC
-	mainwindow.cpp
-	mainwindow.h
-	mainwindow.ui
+	MainWindow.cpp
+	MainWindow.h
+	MainWindow.ui
+
+	LoginWindow.h LoginWindow.cpp LoginWindow.ui
+	LoginWindow.cpp  #
+	LoginWindow.h    #
+	LoginWindow.ui   #
+
 )
 
 target_include_directories(ui_lib PUBLIC

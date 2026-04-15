@@ -1,7 +1,8 @@
 add_subdirectory(core)
 add_subdirectory(ui)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp
+    login.h login.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     core_lib
