@@ -10,6 +10,7 @@ Process::Process(std::string processID)
     // Fetch name and owner after initialization
     this->fetchName();
     this->fetchOwner();
+    this->resourceInfo.fetchInfo();
 };
 
 std::string Process::getID() {
