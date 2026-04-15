@@ -11,6 +11,7 @@ class Process {
         std::string getID();
         std::string getName();
         std::string getOwner();
+        ResourceInfo resourceInfo;
         // TODO: Methods to get stats of process, or maybe make ResourceInfo public?
     private:
         std::string pID;
@@ -18,5 +19,4 @@ class Process {
         std::string owner;
         void fetchName();
         void fetchOwner();
-        ResourceInfo resourceInfo;
 };
