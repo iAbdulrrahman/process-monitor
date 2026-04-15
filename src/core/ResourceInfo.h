@@ -31,10 +31,12 @@ class ResourceInfo
     public:
         ResourceInfo(std::string processID);
         void fetchInfo();
-        std::string getCPURate();
-        std::string getMemSize();
-        std::string getReadSpeed();
-        std::string getWriteSpeed();
+        std::string getCPURate() const;
+        std::string getMemSize() const;
+        std::string getReadSpeed() const;
+        std::string getWriteSpeed() const;
+        double getCPURateValue() const;
+        double getMemBytes() const;
     private:
         std::string pID;
         double memSize = 0.0;

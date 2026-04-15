@@ -23,21 +23,29 @@ void ResourceInfo::fetchInfo() {
     this->fetchIOStats();
 }
 
-std::string ResourceInfo::getCPURate() {
+std::string ResourceInfo::getCPURate() const {
     // format to percentage with 2 decimal places
     return std::format("{:.2f}%", this->cpuUsage.cpuUtilizationRate);
 }
 
-std::string ResourceInfo::getMemSize() {
+std::string ResourceInfo::getMemSize() const {
     return format_size_from_bytes(this->memSize);
 }
 
-std::string ResourceInfo::getReadSpeed() {
+std::string ResourceInfo::getReadSpeed() const {
     return format_size_from_bytes(this->diskUsage.read_speed) + "/s";
 }
 
-std::string ResourceInfo::getWriteSpeed() {
+std::string ResourceInfo::getWriteSpeed() const {
     return format_size_from_bytes(this->diskUsage.write_speed) + "/s";
+}
+
+double ResourceInfo::getCPURateValue() const {
+    return this->cpuUsage.cpuUtilizationRate;
+}
+
+double ResourceInfo::getMemBytes() const {
+    return this->memSize;
 }
 
 void ResourceInfo::fetchCPUStats() {
@@ -61,7 +69,7 @@ void ResourceInfo::fetchCPUStats() {
     }
 
     if (leftParen == std::string::npos || rightParen == std::string::npos || rightParen <= leftParen) {
-        throw std::runtime_error("Failed to parse /proc stat for pid " + this->pID);
+        return;
     }
 
     std::size_t tailStart = rightParen + 1;
@@ -81,11 +89,17 @@ void ResourceInfo::fetchCPUStats() {
     // field 14 (utime) -> tailStats[11]
     // field 15 (stime) -> tailStats[12]
     if (tailStats.size() <= 12) {
-        throw std::runtime_error("/proc stat has insufficient fields for pid " + this->pID);
+        return;
     }
 
-    long utime = std::stol(tailStats.at(11));
-    long stime = std::stol(tailStats.at(12));
+    long utime = 0;
+    long stime = 0;
+    try {
+        utime = std::stol(tailStats.at(11));
+        stime = std::stol(tailStats.at(12));
+    } catch (const std::exception&) {
+        return;
+    }
 
     if(this->cpuUsage.previousUtime == -1 && this->cpuUsage.previousStime == -1) {
         // First sample, no calculation can be done.
@@ -114,17 +128,27 @@ void ResourceInfo::fetchCPUStats() {
 void ResourceInfo::fetchMemStats() {
     std::string path = std::format(PROC_MEM_STATS_PATH, this->pID);
     std::string output = open_file(path);
-    std::vector<std::string> statm = split_string(output, " ");
 
     if(output.empty()) {
         return;
     }
 
+    std::vector<std::string> statm = split_string(output, " ");
+    if (statm.size() <= 2) {
+        return;
+    }
+
     int pageSize = sysconf(_SC_PAGESIZE);
 
-    long residentPages = std::stol(statm.at(1));
+    long residentPages = 0;
+    long sharedPages = 0;
+    try {
+        residentPages = std::stol(statm.at(1));
+        sharedPages = std::stol(statm.at(2));
+    } catch (const std::exception&) {
+        return;
+    }
     long residentSize = residentPages * pageSize;
-    long sharedPages = std::stol(statm.at(2));
     long sharedSize = sharedPages * pageSize;
 
     this->memSize = residentSize - sharedSize;
@@ -135,14 +159,29 @@ void ResourceInfo::fetchIOStats() {
 
     std::string path = std::format(PROC_IO_STATS_PATH, this->pID);
     std::string output = open_file(path);
-    std::vector<std::string> iostat = split_string(output, "\n");
-
     if(output.empty()) {
         return;
     }
 
-    long read_bytes = std::stol(split_string(iostat.at(4), ": ").at(1));
-    long write_bytes = std::stol(split_string(iostat.at(5), ": ").at(1));
+    std::vector<std::string> iostat = split_string(output, "\n");
+    if (iostat.size() <= 5) {
+        return;
+    }
+
+    const std::vector<std::string> readParts = split_string(iostat.at(4), ": ");
+    const std::vector<std::string> writeParts = split_string(iostat.at(5), ": ");
+    if (readParts.size() <= 1 || writeParts.size() <= 1) {
+        return;
+    }
+
+    long read_bytes = 0;
+    long write_bytes = 0;
+    try {
+        read_bytes = std::stol(readParts.at(1));
+        write_bytes = std::stol(writeParts.at(1));
+    } catch (const std::exception&) {
+        return;
+    }
 
     if(this->diskUsage.prev_read_bytes == -1 && this->diskUsage.prev_write_bytes == -1) {
         this->diskUsage.prev_read_bytes = read_bytes;
