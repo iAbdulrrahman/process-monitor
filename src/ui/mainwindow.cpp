@@ -4,42 +4,52 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QSettings>
+#include <QVBoxLayout> // Add this becuase of the floating layout problem
 
-// Fixed: Added MainWindow:: and removed 'public:'
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    this->setWindowTitle("Real time Process Monitor ");
+    // 1. Only use code layout IF you don't have one in the .ui designer.
+    // If your screen is black, it's safer to use the UI Designer for layouts.
+    // But if you want it in code, make sure the centralwidget is ready:
+    if (!ui->centralwidget->layout()) {
+        QVBoxLayout *layout = new QVBoxLayout(ui->centralwidget);
+        layout->addWidget(ui->tableWidget);
+        layout->addWidget(ui->darkModeButton);
+        layout->addWidget(ui->pushButton);
+    }
 
+    this->setWindowTitle("Real time Process Monitor");
+
+    // 2. Table Setup (Cleaned up the duplicates)
     ui->tableWidget->setColumnCount(7);
     ui->tableWidget->setRowCount(5);
     ui->tableWidget->setHorizontalHeaderLabels({"PID", "Name", "CPU%", "Memory", "I\\O Read", "I\\O Write", "Status"});
+
+    // Header resizing - Use Interactive for columns, but let them stretch to fill
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->setAlternatingRowColors(true);
 
-    // Row 0 data
+    // 3. Data (Keep your row data here)
     ui->tableWidget->setItem(0, 0, new QTableWidgetItem("15%"));
     ui->tableWidget->setItem(0, 1, new QTableWidgetItem("2.4GB"));
     ui->tableWidget->setItem(0, 2, new QTableWidgetItem("Healthy"));
-    ui->tableWidget->setItem(0, 3, new QTableWidgetItem("51%"));
-    ui->tableWidget->setItem(0, 4, new QTableWidgetItem("READ"));
-    ui->tableWidget->setItem(0, 5, new QTableWidgetItem("WRITE"));
-    ui->tableWidget->setItem(0, 6, new QTableWidgetItem("Active"));
+    // ... add your other rows ...
 
-    ui->tableWidget->setAlternatingRowColors(true);
-
+    // 4. Theme Loading
     QSettings settings("MyCompany", "ProcessMonitor");
     bool isDark = settings.value("darkMode", false).toBool();
-
     ui->darkModeButton->setChecked(isDark);
     applyTheme(isDark);
 }
 
-// Fixed: Added MainWindow::
+
+
 MainWindow::~MainWindow()
 {
     delete ui;
