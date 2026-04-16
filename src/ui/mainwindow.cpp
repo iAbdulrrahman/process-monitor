@@ -82,11 +82,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
 void MainWindow::applyTheme(bool dark) {
     if (dark) {
         this->setStyleSheet(
