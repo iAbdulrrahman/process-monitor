@@ -8,9 +8,12 @@ class ProcessMonitor {
     public:
         ProcessMonitor();
         Process getProcess(std::string processID);
+        const std::vector<Process>& getProcesses() const;
+        void refresh();
     private:
         std::vector<Process> processes = {};
         void fetchProcesses();
+        bool isZombie(const std::string& processID) const;
         void addProcess(std::string processID);
-        void removeProcess(Process process);
+        void removeProcess(const std::string& processID);
 };

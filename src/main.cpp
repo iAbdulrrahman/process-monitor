@@ -1,11 +1,8 @@
 #include <iostream>
-#include "core/ProcessMonitor.h"
 #include "ui/mainwindow.h"
 #include "LoginWindow.h"  //for login window   first
 
 #include <QApplication>
-#include <QTableWidget>
-
 
 int main(int argc, char *argv[])
 {

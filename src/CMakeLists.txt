@@ -2,13 +2,9 @@
 add_subdirectory(core)
 add_subdirectory(ui)
 
-# Create the executable with ONLY the files that actually exist in src/
-add_executable(ProcessMonitor
-    main.cpp
-)
+add_executable(${PROJECT_NAME} main.cpp)
 
-# Link the libraries from the subdirectories
-target_link_libraries(ProcessMonitor PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ui_lib
     core_lib
 )
