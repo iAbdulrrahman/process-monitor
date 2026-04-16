@@ -1,14 +1,15 @@
+# Add the subdirectories first so the libraries are created
 add_subdirectory(core)
 add_subdirectory(ui)
 
-add_executable(${PROJECT_NAME} main.cpp
-    login.h login.cpp)
+# Create the executable with ONLY the files that actually exist in src/
+add_executable(ProcessMonitor
+    main.cpp
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    core_lib
+# Link the libraries from the subdirectories
+target_link_libraries(ProcessMonitor PRIVATE
     ui_lib
+    core_lib
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-)
