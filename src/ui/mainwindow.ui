@@ -20,14 +20,37 @@
       <item>
        <widget class="QTableWidget" name="tableWidget"/>
       </item>
-      <item>
-       <widget class="QRadioButton" name="darkModeButton">
-        <property name="text">
-         <string>Night Mode</string>
-        </property>
-       </widget>
-      </item>
-      
+        <item>
+         <layout class="QHBoxLayout" name="controlsLayout">
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+            <width>40</width>
+            <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="preferencesButton">
+            <property name="text">
+             <string>Preferences</string>
+            </property>
+            <property name="toolTip">
+             <string>Display settings and refresh rate</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::InstantPopup</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
      </layout>
     </item>
    </layout>

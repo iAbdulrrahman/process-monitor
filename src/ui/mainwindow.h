@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QSettings>
-#include <QSettings>  // 
 #include <QTimer>
 #include "../core/Process.h"
 #include "../core/ProcessMonitor.h"
@@ -21,14 +20,10 @@ public:
     ~MainWindow();
     void updateList(const std::vector<Process>& processes);
 
-
-
-
-private slots:
-    void on_pushButton_clicked();
-    void on_darkModeButton_toggled(bool checked); // Handles the click
-    void applyTheme(bool dark);                  // Helper to change colors
 private:
+    void applyTheme(bool dark);
+    void setupPreferencesMenu();
+
     Ui::MainWindow* ui;
     ProcessMonitor processMonitor;
     QTimer* refreshTimer;

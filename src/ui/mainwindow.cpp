@@ -7,8 +7,14 @@
 #include <QSettings>
 #include <QSet>
 #include <QFont>
+#include <QStringList>
+#include <QToolButton>
+#include <QMenu>
+#include <QAction>
+#include <QActionGroup>
 #include <format>
 #include "../core/Process.h"
+#include "../core/SystemInfo.h"
 #include "../core/utils.h"
 
 namespace {
@@ -44,8 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (!ui->centralwidget->layout()) {
         QVBoxLayout *layout = new QVBoxLayout(ui->centralwidget);
         layout->addWidget(ui->tableWidget);
-        layout->addWidget(ui->darkModeButton);
-        //layout->addWidget(ui->pushButton);
+        layout->addWidget(ui->preferencesButton);
     }
 
     this->setWindowTitle("Real time Process Monitor");
@@ -57,8 +62,9 @@ MainWindow::MainWindow(QWidget *parent)
     //Table column title
     ui->tableWidget->setHorizontalHeaderLabels({"PID", "Name", "CPU%", "Memory", "I\\O Read", "I\\O Write", "Owner"});
 
-    // Header resizing - Use Interactive for columns, but let them stretch to fill
+    // Header resizing - pre-interactive behavior.
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setAlternatingRowColors(true);
@@ -66,21 +72,23 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(20);
     ui->tableWidget->verticalHeader()->setMinimumSectionSize(18);
     ui->tableWidget->horizontalHeader()->setFixedHeight(52);
+    ui->tableWidget->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
 
     QFont tableFont = ui->tableWidget->font();
     tableFont.setPointSize(9);
     ui->tableWidget->setFont(tableFont);
 
+    QFont headerFont = ui->tableWidget->horizontalHeader()->font();
+    headerFont.setPointSize(9);
+    ui->tableWidget->horizontalHeader()->setFont(headerFont);
+
     // Enable click-to-sort on columns
     ui->tableWidget->setSortingEnabled(true);
     ui->tableWidget->horizontalHeader()->setSortIndicatorShown(true);
     ui->tableWidget->horizontalHeader()->setSectionsClickable(true);
+    ui->tableWidget->horizontalHeader()->setSortIndicator(2, Qt::DescendingOrder);
 
-    // 4. Theme Loading
-    QSettings settings("MyCompany", "ProcessMonitor");
-    bool isDark = settings.value("darkMode", false).toBool();
-    ui->darkModeButton->setChecked(isDark);
-    applyTheme(isDark);
+    setupPreferencesMenu();
 
     // Initial render and periodic updates every second (on UI thread)
     updateList(this->processMonitor.getProcesses());
@@ -88,7 +96,75 @@ MainWindow::MainWindow(QWidget *parent)
         this->processMonitor.refresh();
         this->updateList(this->processMonitor.getProcesses());
     });
-    refreshTimer->start(1000);
+
+    QSettings settings("MyCompany", "ProcessMonitor");
+    const int refreshRateMs = settings.value("refreshRateMs", 1000).toInt();
+    refreshTimer->start(refreshRateMs > 0 ? refreshRateMs : 1000);
+}
+
+
+void MainWindow::setupPreferencesMenu() {
+    QSettings settings("MyCompany", "ProcessMonitor");
+
+    QMenu* preferencesMenu = new QMenu(this);
+
+    QAction* darkModeAction = preferencesMenu->addAction("Night Mode");
+    darkModeAction->setCheckable(true);
+
+    const bool isDark = settings.value("darkMode", false).toBool();
+    darkModeAction->setChecked(isDark);
+    applyTheme(isDark);
+
+    connect(darkModeAction, &QAction::toggled, this, [this](bool checked) {
+        applyTheme(checked);
+        QSettings prefs("MyCompany", "ProcessMonitor");
+        prefs.setValue("darkMode", checked);
+    });
+
+    QMenu* refreshMenu = preferencesMenu->addMenu("Refresh Rate");
+    QActionGroup* refreshGroup = new QActionGroup(this);
+    refreshGroup->setExclusive(true);
+
+    const int currentRate = settings.value("refreshRateMs", 1000).toInt();
+
+    auto addRefreshAction = [&](const QString& text, int intervalMs) {
+        QAction* action = refreshMenu->addAction(text);
+        action->setCheckable(true);
+        action->setData(intervalMs);
+        refreshGroup->addAction(action);
+
+        if (currentRate == intervalMs) {
+            action->setChecked(true);
+        }
+    };
+
+    addRefreshAction("0.5s", 500);
+    addRefreshAction("1s", 1000);
+    addRefreshAction("2s", 2000);
+    addRefreshAction("5s", 5000);
+
+    if (!refreshGroup->checkedAction()) {
+        const QList<QAction*> refreshActions = refreshGroup->actions();
+        if (!refreshActions.isEmpty()) {
+            refreshActions.at(1)->setChecked(true);
+        }
+    }
+
+    connect(refreshGroup, &QActionGroup::triggered, this, [this](QAction* action) {
+        const int intervalMs = action->data().toInt();
+        if (intervalMs > 0) {
+            refreshTimer->setInterval(intervalMs);
+            if (!refreshTimer->isActive()) {
+                refreshTimer->start();
+            }
+            QSettings prefs("MyCompany", "ProcessMonitor");
+            prefs.setValue("refreshRateMs", intervalMs);
+        }
+    });
+
+    if (ui->preferencesButton) {
+        ui->preferencesButton->setMenu(preferencesMenu);
+    }
 }
 
 
@@ -98,8 +174,11 @@ void MainWindow::applyTheme(bool dark) {
         this->setStyleSheet(
             "QMainWindow { background-color: #1e1e1e; }"
             "QTableWidget { background-color: #252526; color: #d4d4d4; gridline-color: #333333; selection-background-color: #094771; selection-color: #ffffff; border: none; alternate-background-color: #2d2d2d; font-size: 9pt; }"
-            "QHeaderView::section { background-color: #333333; color: #cccccc; padding: 4px; border: 1px solid #1e1e1e; font-weight: 600; font-size: 9pt; }"
-            "QRadioButton, QLabel { color: #d4d4d4; font-size: 11pt; }"
+            "QHeaderView::section { background-color: #333333; color: #cccccc; padding: 4px; border: 1px solid #1e1e1e; font-weight: 600; }"
+            "QLabel { color: #d4d4d4; font-size: 11pt; }"
+            "QToolButton#preferencesButton { background-color: #333333; color: white; border: 1px solid #454545; border-radius: 4px; padding: 6px 10px; }"
+            "QToolButton#preferencesButton:hover { background-color: #454545; }"
+            "QToolButton#preferencesButton::menu-indicator { image: none; width: 0; }"
             "QPushButton { background-color: #333333; color: white; border: 1px solid #454545; border-radius: 4px; padding: 8px 15px; }"
             "QPushButton:hover { background-color: #454545; }"
             "QPushButton:pressed { background-color: #094771; }"
@@ -108,16 +187,12 @@ void MainWindow::applyTheme(bool dark) {
         this->setStyleSheet(
             "QMainWindow { background-color: #f5f5f5; }"
             "QTableWidget { background-color: white; alternate-background-color: #f9f9f9; font-size: 9pt; }"
-            "QHeaderView::section { background-color: #e0e0e0; border: 1px solid #cccccc; padding: 4px; font-size: 9pt; }"
+            "QHeaderView::section { background-color: #e0e0e0; border: 1px solid #cccccc; padding: 4px; }"
+            "QToolButton#preferencesButton { padding: 6px 10px; }"
+            "QToolButton#preferencesButton::menu-indicator { image: none; width: 0; }"
             "QPushButton { padding: 8px; } "
             );
     }
-}
-
-void MainWindow::on_darkModeButton_toggled(bool checked) {
-    applyTheme(checked);
-    QSettings settings("MyCompany", "ProcessMonitor");
-    settings.setValue("darkMode", checked);
 }
 
 
@@ -236,27 +311,24 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
     const QString processCountText = QString::number(static_cast<qulonglong>(processes.size()));
     const QString totalCpuText = QString::fromStdString(std::format("{:.2f}%", totalCpuPercent));
     const QString totalMemText = QString::fromStdString(format_size_from_bytes(totalMemBytes));
+    const QString totalSystemMemText = QString::fromStdString(format_size_from_bytes(SystemInfo::totalMemoryBytes()));
     const QString totalReadText = QString::fromStdString(format_size_from_bytes(totalReadBytesPerSec));
     const QString totalWriteText = QString::fromStdString(format_size_from_bytes(totalWriteBytesPerSec));
 
-    table->setHorizontalHeaderLabels({
+    const QStringList headerLabels = {
         "PID",
-        QString("Name\n%1 processes").arg(processCountText),
-        QString("CPU%\nTotal %1").arg(totalCpuText),
-        QString("Memory\nTotal %1").arg(totalMemText),
-        QString("I/O Read\nTotal %1/s").arg(totalReadText),
-        QString("I/O Write\nTotal %1/s").arg(totalWriteText),
+        QString("Name\n%1 proc").arg(processCountText),
+        QString("CPU%\n%1").arg(totalCpuText),
+        QString("Memory\n%1 / %2").arg(totalMemText).arg(totalSystemMemText),
+        QString("Read\n%1/s").arg(totalReadText),
+        QString("Write\n%1/s").arg(totalWriteText),
         "Owner"
-    });
+    };
+
+    table->setHorizontalHeaderLabels(headerLabels);
 
     table->setSortingEnabled(true);
     if (sortColumn >= 0) {
         table->sortByColumn(sortColumn, sortOrder);
     }
-}
-
-//when button is clicked then close application
-void MainWindow::on_pushButton_clicked()
-{
-    this->close();
 }
