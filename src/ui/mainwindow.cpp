@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
         QVBoxLayout *layout = new QVBoxLayout(ui->centralwidget);
         layout->addWidget(ui->tableWidget);
         layout->addWidget(ui->darkModeButton);
-        layout->addWidget(ui->pushButton);
+        //layout->addWidget(ui->pushButton);
     }
 
     this->setWindowTitle("Real time Process Monitor");
