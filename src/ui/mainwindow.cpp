@@ -6,7 +6,10 @@
 #include <QHeaderView>
 #include <QSettings>
 #include <QSet>
+#include <QFont>
+#include <format>
 #include "../core/Process.h"
+#include "../core/utils.h"
 
 namespace {
 class NumericTableWidgetItem : public QTableWidgetItem {
@@ -59,6 +62,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setAlternatingRowColors(true);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(20);
+    ui->tableWidget->verticalHeader()->setMinimumSectionSize(18);
+    ui->tableWidget->horizontalHeader()->setFixedHeight(52);
+
+    QFont tableFont = ui->tableWidget->font();
+    tableFont.setPointSize(9);
+    ui->tableWidget->setFont(tableFont);
 
     // Enable click-to-sort on columns
     ui->tableWidget->setSortingEnabled(true);
@@ -86,8 +97,8 @@ void MainWindow::applyTheme(bool dark) {
     if (dark) {
         this->setStyleSheet(
             "QMainWindow { background-color: #1e1e1e; }"
-            "QTableWidget { background-color: #252526; color: #d4d4d4; gridline-color: #333333; selection-background-color: #094771; selection-color: #ffffff; border: none; alternate-background-color: #2d2d2d; }"
-            "QHeaderView::section { background-color: #333333; color: #cccccc; padding: 6px; border: 1px solid #1e1e1e; font-weight: bold; }"
+            "QTableWidget { background-color: #252526; color: #d4d4d4; gridline-color: #333333; selection-background-color: #094771; selection-color: #ffffff; border: none; alternate-background-color: #2d2d2d; font-size: 9pt; }"
+            "QHeaderView::section { background-color: #333333; color: #cccccc; padding: 4px; border: 1px solid #1e1e1e; font-weight: 600; font-size: 9pt; }"
             "QRadioButton, QLabel { color: #d4d4d4; font-size: 11pt; }"
             "QPushButton { background-color: #333333; color: white; border: 1px solid #454545; border-radius: 4px; padding: 8px 15px; }"
             "QPushButton:hover { background-color: #454545; }"
@@ -96,8 +107,8 @@ void MainWindow::applyTheme(bool dark) {
     } else {
         this->setStyleSheet(
             "QMainWindow { background-color: #f5f5f5; }"
-            "QTableWidget { background-color: white; alternate-background-color: #f9f9f9; }"
-            "QHeaderView::section { background-color: #e0e0e0; border: 1px solid #cccccc; }"
+            "QTableWidget { background-color: white; alternate-background-color: #f9f9f9; font-size: 9pt; }"
+            "QHeaderView::section { background-color: #e0e0e0; border: 1px solid #cccccc; padding: 4px; font-size: 9pt; }"
             "QPushButton { padding: 8px; } "
             );
     }
@@ -136,6 +147,10 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
     table->setSortingEnabled(false);
 
     QSet<QString> livePids;
+    double totalCpuPercent = 0.0;
+    double totalMemBytes = 0.0;
+    double totalReadBytesPerSec = 0.0;
+    double totalWriteBytesPerSec = 0.0;
 
     for (const Process& process : processes) {
         const QString pid = QString::fromStdString(process.getID()).trimmed();
@@ -145,6 +160,11 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
         const QString readSpeed = QString::fromStdString(process.resourceInfo.getReadSpeed());
         const QString writeSpeed = QString::fromStdString(process.resourceInfo.getWriteSpeed());
         const QString owner = QString::fromStdString(process.getOwner());
+
+        totalCpuPercent += process.resourceInfo.getCPURateValue();
+        totalMemBytes += process.resourceInfo.getMemBytes();
+        totalReadBytesPerSec += process.resourceInfo.getReadSpeedBytesPerSec();
+        totalWriteBytesPerSec += process.resourceInfo.getWriteSpeedBytesPerSec();
 
         livePids.insert(pid);
 
@@ -212,6 +232,22 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
             table->removeRow(row);
         }
     }
+
+    const QString processCountText = QString::number(static_cast<qulonglong>(processes.size()));
+    const QString totalCpuText = QString::fromStdString(std::format("{:.2f}%", totalCpuPercent));
+    const QString totalMemText = QString::fromStdString(format_size_from_bytes(totalMemBytes));
+    const QString totalReadText = QString::fromStdString(format_size_from_bytes(totalReadBytesPerSec));
+    const QString totalWriteText = QString::fromStdString(format_size_from_bytes(totalWriteBytesPerSec));
+
+    table->setHorizontalHeaderLabels({
+        "PID",
+        QString("Name\n%1 processes").arg(processCountText),
+        QString("CPU%\nTotal %1").arg(totalCpuText),
+        QString("Memory\nTotal %1").arg(totalMemText),
+        QString("I/O Read\nTotal %1/s").arg(totalReadText),
+        QString("I/O Write\nTotal %1/s").arg(totalWriteText),
+        "Owner"
+    });
 
     table->setSortingEnabled(true);
     if (sortColumn >= 0) {

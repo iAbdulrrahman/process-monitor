@@ -37,6 +37,8 @@ class ResourceInfo
         std::string getWriteSpeed() const;
         double getCPURateValue() const;
         double getMemBytes() const;
+        double getReadSpeedBytesPerSec() const;
+        double getWriteSpeedBytesPerSec() const;
     private:
         std::string pID;
         double memSize = 0.0;

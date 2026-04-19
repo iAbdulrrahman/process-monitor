@@ -48,6 +48,14 @@ double ResourceInfo::getMemBytes() const {
     return this->memSize;
 }
 
+double ResourceInfo::getReadSpeedBytesPerSec() const {
+    return this->diskUsage.read_speed;
+}
+
+double ResourceInfo::getWriteSpeedBytesPerSec() const {
+    return this->diskUsage.write_speed;
+}
+
 void ResourceInfo::fetchCPUStats() {
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
 
