@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setRowCount(0);
 
     //Table column title
-    ui->tableWidget->setHorizontalHeaderLabels({"PID", "Name", "CPU%", "Memory", "I\\O Read", "I\\O Write", "Status"});
+    ui->tableWidget->setHorizontalHeaderLabels({"PID", "Name", "CPU%", "Memory", "I\\O Read", "I\\O Write", "Owner"});
 
     // Header resizing - Use Interactive for columns, but let them stretch to fill
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -144,6 +144,7 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
         const QString memory = QString::fromStdString(process.resourceInfo.getMemSize());
         const QString readSpeed = QString::fromStdString(process.resourceInfo.getReadSpeed());
         const QString writeSpeed = QString::fromStdString(process.resourceInfo.getWriteSpeed());
+        const QString owner = QString::fromStdString(process.getOwner());
 
         livePids.insert(pid);
 
@@ -197,12 +198,12 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
         }
         writeItem->setText(writeSpeed);
 
-        QTableWidgetItem* statusItem = table->item(row, 6);
-        if (!statusItem) {
-            statusItem = new QTableWidgetItem();
-            table->setItem(row, 6, statusItem);
+        QTableWidgetItem* ownerItem = table->item(row, 6);
+        if (!ownerItem) {
+            ownerItem = new QTableWidgetItem();
+            table->setItem(row, 6, ownerItem);
         }
-        statusItem->setText("active");
+        ownerItem->setText(owner);
     }
 
     for (int row = table->rowCount() - 1; row >= 0; --row) {
