@@ -119,9 +119,10 @@ void ResourceInfo::fetchCPUStats() {
         long deltaCPUTicks = (utime + stime) - (this->cpuUsage.previousUtime + this->cpuUsage.previousStime);
         double elapsedSeconds = std::chrono::duration<double>(currentTime - this->cpuUsage.previousTime).count();
 
-        long numberOfCPUs = sysconf(_SC_NPROCESSORS_ONLN);
+        const long numberOfCPUs = SystemInfo::cpuCount();
+        const long clockTicks = SystemInfo::clockTicksPerSecond();
 
-        double totalTicks = elapsedSeconds * HZ * numberOfCPUs;
+        double totalTicks = elapsedSeconds * clockTicks * numberOfCPUs;
 
         this->cpuUsage.cpuUtilizationRate = (totalTicks > 0.0)
         ? (deltaCPUTicks / totalTicks) * 100.0
@@ -146,7 +147,7 @@ void ResourceInfo::fetchMemStats() {
         return;
     }
 
-    int pageSize = sysconf(_SC_PAGESIZE);
+    const long pageSize = SystemInfo::pageSizeBytes();
 
     long residentPages = 0;
     long sharedPages = 0;
