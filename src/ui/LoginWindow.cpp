@@ -2,6 +2,7 @@
 #include "ui_LoginWindow.h"
 #include "mainwindow.h"
 #include <QMessageBox>
+#include "Forgotpassworddialog.h"
 
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
@@ -55,4 +56,25 @@ void LoginDialog::on_pushButton_login_clicked()
     }
 }
 
+
+
+void LoginDialog::on_pushButton_clicked()
+{
+    //click close current dialog
+    //goto ForgotPasswordDialog
+    // 1. Hide/Close the login window
+    this->hide();
+
+    // 2. Create the Forgot Password Dialog
+    // Use 'nullptr' or no parent so it doesn't get hidden if 'this' is destroyed
+    ForgotPasswordDialog *forgotDlg = new ForgotPasswordDialog();
+
+    // 3. Ensure it cleans up memory when closed
+    forgotDlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    // 4. Show the new window
+    forgotDlg->show();
+
+
+}
 

@@ -9,12 +9,17 @@ set(CMAKE_AUTORCC ON)
 
 # Note: We are using lowercase mainwindow to match your actual files on disk
 add_library(ui_lib STATIC
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    LoginWindow.cpp
-    LoginWindow.h
-    LoginWindow.ui
+        mainwindow.cpp
+        mainwindow.h
+        mainwindow.ui
+        LoginWindow.cpp
+        LoginWindow.h
+        LoginWindow.ui
+        # Keep only the lowercase versions that match your .h and .cpp
+        Forgotpassworddialog.cpp
+        Forgotpassworddialog.h
+        Forgotpassworddialog.ui
+
 )
 
 target_include_directories(ui_lib PUBLIC
