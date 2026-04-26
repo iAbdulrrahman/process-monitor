@@ -19,6 +19,8 @@ add_library(ui_lib STATIC
         Forgotpassworddialog.cpp
         Forgotpassworddialog.h
         Forgotpassworddialog.ui
+        welcomepagedialog.h welcomepagedialog.cpp welcomepagedialog.ui
+      #  resources.qrc #for picture
 
 )
 
