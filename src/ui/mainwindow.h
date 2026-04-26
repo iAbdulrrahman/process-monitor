@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QNetworkAccessManager>
 #include <QSettings>
 #include <QTimer>
 #include "../core/Process.h"
@@ -23,9 +24,11 @@ public:
 private:
     void applyTheme(bool dark);
     void setupPreferencesMenu();
+    void publishSystemMetrics(double totalCpuPercent, double totalMemBytes, double totalReadBytesPerSec, double totalWriteBytesPerSec);
 
     Ui::MainWindow* ui;
     ProcessMonitor processMonitor;
+    QNetworkAccessManager* metricsNetworkManager;
     QTimer* refreshTimer;
     int findRowByPid(const QString& pid) const;
 };

@@ -12,6 +12,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QActionGroup>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
 #include <format>
 #include "../core/Process.h"
 #include "../core/SystemInfo.h"
@@ -40,6 +45,7 @@ public:
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , metricsNetworkManager(new QNetworkAccessManager(this))
     , refreshTimer(new QTimer(this))
 {  // constructor of MainWindow
     ui->setupUi(this);
@@ -100,6 +106,25 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings settings("MyCompany", "ProcessMonitor");
     const int refreshRateMs = settings.value("refreshRateMs", 1000).toInt();
     refreshTimer->start(refreshRateMs > 0 ? refreshRateMs : 1000);
+}
+
+void MainWindow::publishSystemMetrics(double totalCpuPercent, double totalMemBytes, double totalReadBytesPerSec, double totalWriteBytesPerSec) {
+    /*
+    const QString memText = QString::fromStdString(format_size_from_bytes(totalMemBytes));
+    const QString readText = QString::fromStdString(format_size_from_bytes(totalReadBytesPerSec));
+    const QString writeText = QString::fromStdString(format_size_from_bytes(totalWriteBytesPerSec));
+    */
+    QJsonObject payload;
+    payload["cpu"] = totalCpuPercent;
+    payload["memory"] = totalMemBytes;
+    payload["ioread"] = totalReadBytesPerSec;
+    payload["iowrite"] = totalWriteBytesPerSec;
+
+    QNetworkRequest request(QUrl("http://localhost:1880/system-metrics"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply* reply = metricsNetworkManager->post(request, QJsonDocument(payload).toJson(QJsonDocument::Compact));
+    connect(reply, &QNetworkReply::finished, reply, &QNetworkReply::deleteLater);
 }
 
 
@@ -314,6 +339,8 @@ void MainWindow::updateList(const std::vector<Process>& processes) {
     const QString totalSystemMemText = QString::fromStdString(format_size_from_bytes(SystemInfo::totalMemoryBytes()));
     const QString totalReadText = QString::fromStdString(format_size_from_bytes(totalReadBytesPerSec));
     const QString totalWriteText = QString::fromStdString(format_size_from_bytes(totalWriteBytesPerSec));
+
+    publishSystemMetrics(totalCpuPercent, totalMemBytes, totalReadBytesPerSec, totalWriteBytesPerSec);
 
     const QStringList headerLabels = {
         "PID",
