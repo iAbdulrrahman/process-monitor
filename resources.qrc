@@ -1,1 +1,5 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/ui">
+        <file alias="heartbeat.png">src/ui/heartbeat.png</file>
+    </qresource>
+</RCC>

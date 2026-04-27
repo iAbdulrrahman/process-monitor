@@ -11,46 +11,101 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+     <string>Process Monitor Login</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_7">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_main">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <layout class="QVBoxLayout" name="verticalLayout_branding">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7"/>
+                <widget class="QLabel" name="label_logo">
+                 <property name="minimumSize">
+                    <size>
+                     <width>160</width>
+                     <height>160</height>
+                    </size>
+                 </property>
+                 <property name="maximumSize">
+                    <size>
+                     <width>200</width>
+                     <height>200</height>
+                    </size>
+                 </property>
+                 <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="text">
+                    <string>PM</string>
+                 </property>
+                </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+                <widget class="QLabel" name="label_appName">
+                 <property name="font">
+                    <font>
+                     <pointsize>18</pointsize>
+                     <bold>true</bold>
+                    </font>
+                 </property>
+                 <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
+                 </property>
          <property name="text">
-          <string>Reset Password</string>
+                    <string>Process Monitor</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Process Monitor with Real-Time CPU, Memory, and I/O Statistics</string>
+                <widget class="QLabel" name="label_4">
+                 <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
+                 <property name="text">
+                    <string>Monitor running processes with real-time CPU, memory, and I/O statistics in one clean dashboard.</string>
+                 </property>
+                 <property name="wordWrap">
+                    <bool>true</bool>
+                 </property>
+                </widget>
+             </item>
+             <item>
+                <spacer name="verticalSpacer_left">
+                 <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                 </property>
+                </spacer>
        </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>50</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
+            </layout>
+         </item>
+         <item>
+            <widget class="Line" name="line">
+             <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </widget>
+         </item>
+         <item>
+            <layout class="QVBoxLayout" name="verticalLayout_formHolder">
+             <item>
+                <spacer name="verticalSpacer_topRight">
+                 <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                 </property>
+                </spacer>
+             </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -92,8 +147,28 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Reset Password</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
+             <item>
+                <spacer name="verticalSpacer_bottomRight">
+                 <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                 </property>
+                </spacer>
+             </item>
       </layout>
      </item>
     </layout>

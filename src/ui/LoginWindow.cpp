@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include <QMessageBox>
 #include "Forgotpassworddialog.h"
+#include <QPixmap>
 
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
@@ -10,8 +11,28 @@ LoginDialog::LoginDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
+    static bool resourceInitialized = []() {
+        Q_INIT_RESOURCE(resources);
+        return true;
+    }();
+    Q_UNUSED(resourceInitialized);
+
     // Programiticly  HIDE password
     ui->lineEdit_password->setEchoMode(QLineEdit::Password); //*
+
+    ui->label_logo->setMinimumSize(220, 220);
+    ui->label_logo->setMaximumSize(260, 260);
+    ui->label_logo->setAlignment(Qt::AlignCenter);
+    ui->verticalLayout_branding->setAlignment(ui->label_logo, Qt::AlignHCenter);
+
+    // Use the app logo from resources
+    const QPixmap logo(":/ui/heartbeat.png");
+    if (!logo.isNull()) {
+        ui->label_logo->setPixmap(logo.scaled(230, 230, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    } else {
+        ui->label_logo->setText("Logo");
+    }
+    ui->label_logo->setScaledContents(false);
 }
 
 LoginDialog::~LoginDialog()
